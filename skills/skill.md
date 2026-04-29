@@ -5,7 +5,7 @@ description: Extract text from images using macOS Vision Framework OCR. Use when
 
 # macocr — macOS OCR Tool
 
-Extract text from images using Apple's Vision Framework. Supports single files, batch processing, and structured JSON output with bounding boxes.
+Extract text from images using Apple's Vision Framework. Supports single files, batch processing, stdin image streams, base64 text input, and structured JSON output with bounding boxes.
 
 ## Quick start
 
@@ -18,6 +18,12 @@ macocr -j screenshot.png
 
 # Save text to file (creates screenshot.txt beside the image)
 macocr -o screenshot.png
+
+# Read binary image data from stdin
+cat screenshot.png | macocr -
+
+# Read base64 image data from stdin
+cat screenshot.b64 | macocr --base64 -
 ```
 
 ## Options
@@ -26,6 +32,7 @@ macocr -o screenshot.png
 |------|-------------|
 | `-o, --ocr` | Export OCR text to `<filename>.txt` beside each source file |
 | `-j, --json` | Output JSON with text and bounding boxes |
+| `--base64` | Decode each input as base64 text before OCR |
 | `-v, --version` | Print version |
 | `-h, --help` | Show help |
 
@@ -58,21 +65,39 @@ macocr screenshot.png | grep "error"
 
 # Save JSON for programmatic processing
 macocr -j screenshot.png > result.json
+
+# OCR binary image data from stdin
+cat screenshot.png | macocr -
+
+# OCR base64 text from stdin
+cat screenshot.b64 | macocr --base64 -
+
+# OCR a base64 text file
+macocr --base64 screenshot.b64
 ```
 
 ## JSON Output Format
 
-With `-j`, output is a JSON array (even for single files):
+With `-j`, output is a JSON object for a single input and a JSON array for multiple inputs:
 ```json
-[
-  {
-    "text": "Extracted text content",
-    "boundingBoxes": [
-      {"x": 100, "y": 50, "width": 200, "height": 30}
-    ]
-  }
-]
+{
+  "file": "screenshot.png",
+  "imageWidth": 1920,
+  "imageHeight": 1080,
+  "text": "Extracted text content\n",
+  "boxes": [
+    {
+      "text": "Extracted text content",
+      "x": 100.0,
+      "y": 50.0,
+      "w": 200.0,
+      "h": 30.0
+    }
+  ]
+}
 ```
+
+For stdin input, the JSON `file` value is `"-"`.
 
 ## Supported Formats
 

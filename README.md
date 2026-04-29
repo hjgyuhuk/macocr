@@ -13,6 +13,7 @@ It provides fast text extraction and bounding box data without needing third-par
     * **Plain Text:** Stream extracted text directly to `stdout`.
     * **JSON:** Structured data including image dimensions, file paths, and bounding boxes.
     * **Batch Export:** Automatically save results as `.txt` files alongside your images.
+* **Pipeline Input:** Read binary image data from `stdin` with `-`, or decode base64 text with `--base64`.
 * **Language Support:** Includes automatic language detection (on macOS 13.0+).
 
 ## Installation
@@ -36,12 +37,13 @@ It provides fast text extraction and bounding box data without needing third-par
 ## Usage
 
 ```bash
-macocr [OPTIONS] <file> [<file> ...]
+macocr [OPTIONS] <file|-> [<file> ...]
 ```
 
 ### Options
 * `-o, --ocr`: Export OCR text to `<filename>.txt` beside each source file.
 * `-j, --json`: Output OCR results as JSON (includes text and bounding boxes).
+* `--base64`: Decode each input as base64 text before OCR.
 * `-v, --version`: Print version and exit.
 * `-h, --help`: Show help.
 
@@ -61,6 +63,21 @@ macocr -j page1.jpg page2.jpg > results.json
 ```bash
 macocr -o screenshot.png
 # Creates screenshot.txt
+```
+
+**4. Read binary image data from stdin:**
+```bash
+cat image.png | macocr -
+```
+
+**5. Read base64 image data from stdin:**
+```bash
+cat image.b64 | macocr --base64 -
+```
+
+`--base64` also works with file arguments that contain base64 text:
+```bash
+macocr --base64 image.b64
 ```
 
 ## JSON Output Schema
